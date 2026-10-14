@@ -1,6 +1,7 @@
 'use strict';
 
 const { Device } = require('homey');
+const { getValidLastKnownIp, applyLastKnownIpSetting } = require('../../lib/ip-address');
 const { safeSetSettings } = require('../../lib/safe-settings');
 const { SmartWiFiParameter } = require('../../lib/smart-wifi-parameters');
 
@@ -105,7 +106,7 @@ class SmartWiFiDevice extends Device {
     this.deviceObject = this.driver.locateDeviceById(id);
     if (this.deviceObject == null) {
       // Try to use last known IP if discovery failed
-      const lastKnownIP = this.getStoreValue('lastKnownIP');
+      const lastKnownIP = await getValidLastKnownIp(this);
       if (lastKnownIP && lastKnownIP !== '0.0.0.0') {
         this.log(`Discovery failed, attempting to use last known IP: ${lastKnownIP}`);
         this.deviceObject = {
@@ -271,12 +272,14 @@ class SmartWiFiDevice extends Device {
   }
 
   async onSettings({ oldSettings, newSettings, changedKeys }) {
+    // Validate first, so an invalid address rejects the save before any other
+    // setting is pushed to the device.
+    if (changedKeys.includes('last_known_ip')) {
+      await applyLastKnownIpSetting(this, newSettings.last_known_ip);
+    }
     if (changedKeys.includes('devicepwd')) {
       this.devicepwd = newSettings.devicepwd;
       await this.updateDeviceState();
-    }
-    if (changedKeys.includes('last_known_ip')) {
-      this.setStoreValue('lastKnownIP', newSettings.last_known_ip);
     }
 
     // Sensor permissions are writable on the device. Without this the settings

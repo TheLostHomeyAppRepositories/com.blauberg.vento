@@ -70,5 +70,8 @@
   },
   "1.4.8": {
     "en": "Smart Wi-Fi/iFan: added moisture, heat and motion alarms showing when a sensor is driving the fan (usable in flows), and the sensor settings are now actually sent to the device"
+  },
+  "1.4.9": {
+    "en": "Fixed an app crash when the IP address setting included a port number (e.g. :4000). The port is now removed automatically and invalid addresses are refused."
   }
 }

@@ -2,10 +2,11 @@
 
 const { Driver } = require('homey');
 const {
-  BlaubergVentoClient, Packet, FunctionType, Parameter, DataEntry,
+  Packet, FunctionType, Parameter, DataEntry,
 } = require('blaubergventojs');
 const { discoverDevices, scanByIP } = require('../../lib/device-discovery');
 const { sendWithRetry } = require('../../lib/modbus-retry');
+const { SafeVentoClient } = require('../../lib/safe-vento-client');
 
 class VentoDriver extends Driver {
 
@@ -14,7 +15,7 @@ class VentoDriver extends Driver {
    */
   async onInit() {
     this.deviceList = [];
-    this.modbusClient = new BlaubergVentoClient();
+    this.modbusClient = new SafeVentoClient();
     this.modbusClient.timeout = 1500;
     // Extend library's default parameter sizes with extra params not in the enum
     const EXTRA_PARAMS = { 11: 3 }; // Active timer countdown: 3 bytes (sec, min, hour)

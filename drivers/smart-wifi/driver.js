@@ -2,11 +2,12 @@
 
 const { Driver } = require('homey');
 const {
-  BlaubergVentoClient, Packet, FunctionType, DataEntry,
+  Packet, FunctionType, DataEntry,
 } = require('blaubergventojs');
 const { SmartWiFiParameter, SmartWiFiParameterSizes } = require('../../lib/smart-wifi-parameters');
 const { discoverDevices, scanByIP } = require('../../lib/device-discovery');
 const { sendWithRetry } = require('../../lib/modbus-retry');
+const { SafeVentoClient } = require('../../lib/safe-vento-client');
 
 class SmartWiFiDriver extends Driver {
 
@@ -15,7 +16,7 @@ class SmartWiFiDriver extends Driver {
    */
   async onInit() {
     this.deviceList = [];
-    this.modbusClient = new BlaubergVentoClient();
+    this.modbusClient = new SafeVentoClient();
     this.modbusClient.timeout = 1500;
     this.modbusClient.parameterSizeResolver = (param) => {
       // Special-command bytes that can appear in a controller response are each
