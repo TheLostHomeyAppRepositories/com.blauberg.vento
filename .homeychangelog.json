@@ -73,5 +73,8 @@
   },
   "1.4.9": {
     "en": "Fixed an app crash when the IP address setting included a port number (e.g. :4000). The port is now removed automatically and invalid addresses are refused."
+  },
+  "1.4.10": {
+    "en": "Fixed an app crash that could happen while a device was being found on the network."
   }
 }

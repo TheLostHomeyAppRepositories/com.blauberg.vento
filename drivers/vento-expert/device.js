@@ -17,6 +17,9 @@ class VentoDevice extends Device {
    */
   async onInit() {
     const { id } = this.getData();
+    // Set before discovery: once deviceObject exists, polls and flow actions can
+    // send packets, and an undefined password crashes the library's send().
+    this.devicepwd = this.getSetting('devicepwd') || '1111';
     this.log(`Locating device with id ${id}`);
     await this.discovery(id);
     await this.updateCapabilities();
@@ -92,7 +95,6 @@ class VentoDevice extends Device {
         };
         // Test if device responds at this IP
         try {
-          this.devicepwd = this.getSetting('devicepwd') || '1111';
           const state = await this.driver.getDeviceState(this.deviceObject, this.devicepwd);
           if (state) {
             await this.setAvailable();
@@ -108,7 +110,6 @@ class VentoDevice extends Device {
     } else {
       await this.setAvailable();
       this.log(`Vento device has been initialized: [${this.deviceObject.ip}]`);
-      this.devicepwd = this.getSetting('devicepwd') || '1111';
       // Store IP address for future fallback
       await this.setStoreValue('lastKnownIP', this.deviceObject.ip);
       await this.setSettings({ last_known_ip: this.deviceObject.ip });
@@ -233,7 +234,7 @@ class VentoDevice extends Device {
       await applyLastKnownIpSetting(this, newSettings.last_known_ip);
     }
     if (changedKeys.includes('devicepwd')) {
-      this.devicepwd = newSettings.devicepwd;
+      this.devicepwd = newSettings.devicepwd || '1111';
       await this.updateDeviceState();
     }
     // For the other settings we probably need to push the new value to the device

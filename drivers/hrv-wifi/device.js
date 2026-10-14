@@ -17,6 +17,9 @@ class HrvWifiDevice extends Device {
    */
   async onInit() {
     const { id } = this.getData();
+    // Set before discovery: once deviceObject exists, polls and flow actions can
+    // send packets, and an undefined password crashes the library's send().
+    this.devicepwd = this.getSetting('devicepwd') || '1111';
     this.log(`Locating HRV Wi-Fi device with id ${id}`);
     await this.discovery(id);
     await this.updateCapabilities();
@@ -90,7 +93,6 @@ class HrvWifiDevice extends Device {
           ip: lastKnownIP,
         };
         try {
-          this.devicepwd = this.getSetting('devicepwd') || '1111';
           const state = await this.driver.getDeviceState(this.deviceObject, this.devicepwd);
           if (state) {
             await this.setAvailable();
@@ -106,7 +108,6 @@ class HrvWifiDevice extends Device {
     } else {
       await this.setAvailable();
       this.log(`HRV Wi-Fi device initialized: [${this.deviceObject.ip}]`);
-      this.devicepwd = this.getSetting('devicepwd') || '1111';
       await this.setStoreValue('lastKnownIP', this.deviceObject.ip);
       await this.setSettings({ last_known_ip: this.deviceObject.ip });
     }
@@ -233,7 +234,7 @@ class HrvWifiDevice extends Device {
       await applyLastKnownIpSetting(this, newSettings.last_known_ip);
     }
     if (changedKeys.includes('devicepwd')) {
-      this.devicepwd = newSettings.devicepwd;
+      this.devicepwd = newSettings.devicepwd || '1111';
       await this.updateDeviceState();
     }
     if (changedKeys.includes('humidity_sensor')) {
