@@ -76,5 +76,8 @@
   },
   "1.4.10": {
     "en": "Fixed an app crash that could happen while a device was being found on the network."
+  },
+  "1.4.11": {
+    "en": "Devices that get a new IP address from the router are now picked up automatically, instead of staying unreachable until the app restarts."
   }
 }

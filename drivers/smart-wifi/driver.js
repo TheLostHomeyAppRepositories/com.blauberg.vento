@@ -232,6 +232,15 @@ class SmartWiFiDriver extends Driver {
         } else {
           this.log('Located device is not added to Homey yet');
         }
+      } else if (knowndevice.ip !== locatedDevice.ip) {
+        // DHCP gave the device a new address. Only new ids used to be handled,
+        // so the Homey device kept polling the old IP until the app restarted.
+        this.log(`Device ${locatedDevice.id} moved from ${knowndevice.ip} to ${locatedDevice.ip}`);
+        knowndevice.ip = locatedDevice.ip;
+        const homeydevice = homeydevices.find((device) => device.getData().id === locatedDevice.id);
+        if (homeydevice) {
+          homeydevice.discovery(locatedDevice.id);
+        }
       }
     });
     // Now lets ask all our homey enabled devices to update their state
